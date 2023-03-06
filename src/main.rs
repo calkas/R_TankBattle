@@ -1,3 +1,6 @@
+extern crate gfx;
+extern crate gfx_device_gl;
+extern crate gfx_graphics;
 extern crate piston_window;
 use piston_window::*;
 mod engine;
@@ -14,6 +17,8 @@ fn main() {
     windows_settings.set_exit_on_esc(true);
 
     let mut window: PistonWindow = windows_settings.build().unwrap();
+
+    game.load_sprites(&window);
 
     let mut events = Events::new(EventSettings::new());
 

@@ -525,9 +525,9 @@ dependencies = [
 
 [[package]]
 name = "gfx"
-version = "0.18.2"
+version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01de46f9508a5c259aef105f0bff760ceddca832ea9c87ce03d1923e22ee155b"
+checksum = "eb754057e8bfb8fdb38a33b9caa213dbeb2cbbef2003fe6b2cb36dff96098e0a"
 dependencies = [
  "draw_state",
  "gfx_core",
@@ -1380,6 +1380,9 @@ dependencies = [
 name = "r_tank_battle"
 version = "0.1.0"
 dependencies = [
+ "gfx",
+ "gfx_device_gl",
+ "piston2d-gfx_graphics",
  "piston_window",
 ]
 

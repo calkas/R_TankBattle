@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 piston_window = "0.127.0"
+gfx = "0.18.3"
+gfx_device_gl = "0.16.2"
+piston2d-gfx_graphics = "0.79.0"

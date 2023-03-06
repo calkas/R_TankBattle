@@ -1,8 +1,10 @@
-use crate::object::player::{self, Drawable};
-use piston_window::{Button, Context, G2d, Key};
-
+use crate::object::tank::{Drawable, Tank};
+use piston_window::{
+    Button, Context, Flip, G2d, Key, PistonWindow, Texture, TextureContext, TextureSettings,
+};
+use std::path::Path;
 pub mod settings {
-    pub const RESOLUTION: [f64; 2] = [600.0, 400.0];
+    pub const RESOLUTION: [f64; 2] = [800.0, 600.0];
     pub const TITLE: &str = "R_TankBattle";
     #[derive(PartialEq, Eq)]
     pub enum KeyStatus {
@@ -29,20 +31,52 @@ impl Direction {
     }
 }
 pub struct Game {
-    tank: player::Tank,
+    player: Tank,
     direction: Direction,
 }
 
 impl Game {
     pub fn new() -> Self {
         Game {
-            tank: player::Tank::new(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0),
+            player: Tank::new(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0),
             direction: Direction::new(),
         }
     }
 
+    pub fn load_sprites(&mut self, window: &PistonWindow) {
+        let mut texture_context = TextureContext {
+            factory: window.factory.clone(),
+            encoder: window.factory.clone().create_command_buffer().into(),
+        };
+
+        let texture_settings = TextureSettings::new();
+
+        let tank_sprite = Texture::from_path(
+            &mut texture_context,
+            Path::new("assets/tankBase.png"),
+            Flip::None,
+            &texture_settings,
+        );
+
+        if tank_sprite.is_ok() {
+            self.player.set_tank_sprite(tank_sprite.unwrap());
+        }
+
+        let tank_turret = Texture::from_path(
+            &mut texture_context,
+            Path::new("assets/tankTurret.png"),
+            Flip::None,
+            &texture_settings,
+        );
+
+        if tank_turret.is_ok() {
+            self.player.set_turret_sprite(tank_turret.unwrap());
+        }
+
+    }
+
     pub fn render(&self, c: &Context, g: &mut G2d) {
-        self.tank.draw(&c, g);
+        self.player.draw(&c, g);
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
@@ -56,19 +90,19 @@ impl Game {
     }
     pub fn update(&mut self, delta_time: f64) {
         if self.direction.up == KeyStatus::Pressed {
-            self.tank.mov(0.0, -150.0 * delta_time);
+            self.player.mov(0.0, -150.0 * delta_time);
         }
 
         if self.direction.down == KeyStatus::Pressed {
-            self.tank.mov(0.0, 150.0 * delta_time);
+            self.player.mov(0.0, 150.0 * delta_time);
         }
 
         if self.direction.left == KeyStatus::Pressed {
-            self.tank.mov(-150.0 * delta_time, 0.0);
+            self.player.mov(-150.0 * delta_time, 0.0);
         }
 
         if self.direction.right == KeyStatus::Pressed {
-            self.tank.mov(150.0 * delta_time, 0.0);
+            self.player.mov(150.0 * delta_time, 0.0);
         }
     }
 }
