@@ -1,6 +1,7 @@
-use crate::object::tank::{Drawable, Tank};
+use crate::object::tank::Tank;
 use piston_window::{
     Button, Context, Flip, G2d, Key, PistonWindow, Texture, TextureContext, TextureSettings,
+    Transformed,
 };
 use std::path::Path;
 pub mod settings {
@@ -14,15 +15,15 @@ pub mod settings {
 }
 
 use settings::KeyStatus;
-struct Direction {
+struct Control {
     up: KeyStatus,
     down: KeyStatus,
     left: KeyStatus,
     right: KeyStatus,
 }
-impl Direction {
+impl Control {
     pub fn new() -> Self {
-        Direction {
+        Control {
             up: KeyStatus::Released,
             down: KeyStatus::Released,
             left: KeyStatus::Released,
@@ -32,14 +33,14 @@ impl Direction {
 }
 pub struct Game {
     player: Tank,
-    direction: Direction,
+    direction: Control,
 }
 
 impl Game {
     pub fn new() -> Self {
         Game {
-            player: Tank::new(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0),
-            direction: Direction::new(),
+            player: Tank::new(),
+            direction: Control::new(),
         }
     }
 
@@ -72,11 +73,13 @@ impl Game {
         if tank_turret.is_ok() {
             self.player.set_turret_sprite(tank_turret.unwrap());
         }
-
     }
 
     pub fn render(&self, c: &Context, g: &mut G2d) {
-        self.player.draw(&c, g);
+        let center = c
+            .transform
+            .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
+        self.player.draw(center, g);
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
