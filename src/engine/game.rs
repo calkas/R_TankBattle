@@ -3,6 +3,7 @@ use piston_window::{
     Button, Context, Flip, G2d, Key, PistonWindow, Texture, TextureContext, TextureSettings,
     Transformed,
 };
+use crate::object::Entity;
 use std::path::Path;
 pub mod settings {
     pub const RESOLUTION: [f64; 2] = [800.0, 600.0];
@@ -79,7 +80,7 @@ impl Game {
         let center = c
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
-        self.player.draw(center, g);
+        self.player.render(center, g);
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
