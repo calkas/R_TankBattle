@@ -36,7 +36,6 @@ fn main() {
         });
 
         window.draw_2d(&e, |c, g, _d| {
-            clear([0.0, 0.0, 0.0, 1.0], g);
             game.render(&c, g);
         });
     }

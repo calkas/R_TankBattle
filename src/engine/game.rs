@@ -1,9 +1,10 @@
 use crate::object::tank::Tank;
+use crate::object::Entity;
 use piston_window::{
-    Button, Context, Flip, G2d, Key, PistonWindow, Texture, TextureContext, TextureSettings,
+    clear, Button, Context, Flip, G2d, Key, PistonWindow, Texture, TextureContext, TextureSettings,
     Transformed,
 };
-use crate::object::Entity;
+
 use std::path::Path;
 pub mod settings {
     pub const RESOLUTION: [f64; 2] = [800.0, 600.0];
@@ -77,10 +78,14 @@ impl Game {
     }
 
     pub fn render(&self, c: &Context, g: &mut G2d) {
+        clear([0.0, 0.0, 0.0, 1.0], g);
+
         let center = c
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
-        self.player.render(center, g);
+
+        let game_object: &dyn Entity = &self.player;
+        game_object.render(center, g);
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
