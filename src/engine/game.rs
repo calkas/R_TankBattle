@@ -22,6 +22,8 @@ struct Control {
     down: KeyStatus,
     left: KeyStatus,
     right: KeyStatus,
+    turret_left: KeyStatus,
+    turret_right: KeyStatus,
 }
 impl Control {
     pub fn new() -> Self {
@@ -30,6 +32,8 @@ impl Control {
             down: KeyStatus::Released,
             left: KeyStatus::Released,
             right: KeyStatus::Released,
+            turret_left: KeyStatus::Released,
+            turret_right: KeyStatus::Released,
         }
     }
 }
@@ -61,18 +65,15 @@ impl Game {
             &texture_settings,
         );
 
-        if tank_sprite.is_ok() {
-            self.player.set_tank_sprite(tank_sprite.unwrap());
-        }
-
         let tank_turret = Texture::from_path(
             &mut texture_context,
             Path::new("assets/tankTurret.png"),
             Flip::None,
             &texture_settings,
         );
-
-        if tank_turret.is_ok() {
+        
+        if tank_sprite.is_ok() && tank_turret.is_ok() {
+            self.player.set_tank_sprite(tank_sprite.unwrap());
             self.player.set_turret_sprite(tank_turret.unwrap());
         }
     }
@@ -94,6 +95,8 @@ impl Game {
             Button::Keyboard(Key::Down) => self.direction.down = keystatus,
             Button::Keyboard(Key::Left) => self.direction.left = keystatus,
             Button::Keyboard(Key::Right) => self.direction.right = keystatus,
+            Button::Keyboard(Key::S) => self.direction.turret_left = keystatus,
+            Button::Keyboard(Key::D) => self.direction.turret_right = keystatus,
             _ => {}
         }
     }
@@ -112,6 +115,14 @@ impl Game {
 
         if self.direction.right == KeyStatus::Pressed {
             self.player.mov(150.0 * delta_time, 0.0);
+        }
+
+        if self.direction.turret_left == KeyStatus::Pressed {
+            self.player.rottate_turret_left(delta_time);
+        }
+
+        if self.direction.turret_right == KeyStatus::Pressed {
+            self.player.rottate_turret_right(delta_time);
         }
     }
 }
