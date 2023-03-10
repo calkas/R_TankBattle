@@ -39,14 +39,14 @@ impl Control {
 }
 pub struct Game {
     player: Tank,
-    direction: Control,
+    controller: Control,
 }
 
 impl Game {
     pub fn new() -> Self {
         Game {
             player: Tank::new(),
-            direction: Control::new(),
+            controller: Control::new(),
         }
     }
 
@@ -91,37 +91,37 @@ impl Game {
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
         match input {
-            Button::Keyboard(Key::Up) => self.direction.up = keystatus,
-            Button::Keyboard(Key::Down) => self.direction.down = keystatus,
-            Button::Keyboard(Key::Left) => self.direction.left = keystatus,
-            Button::Keyboard(Key::Right) => self.direction.right = keystatus,
-            Button::Keyboard(Key::S) => self.direction.turret_left = keystatus,
-            Button::Keyboard(Key::D) => self.direction.turret_right = keystatus,
+            Button::Keyboard(Key::Up) => self.controller.up = keystatus,
+            Button::Keyboard(Key::Down) => self.controller.down = keystatus,
+            Button::Keyboard(Key::Left) => self.controller.left = keystatus,
+            Button::Keyboard(Key::Right) => self.controller.right = keystatus,
+            Button::Keyboard(Key::S) => self.controller.turret_left = keystatus,
+            Button::Keyboard(Key::D) => self.controller.turret_right = keystatus,
             _ => {}
         }
     }
     pub fn update(&mut self, delta_time: f64) {
-        if self.direction.up == KeyStatus::Pressed {
+        if self.controller.up == KeyStatus::Pressed {
             self.player.mov(0.0, -150.0 * delta_time);
         }
 
-        if self.direction.down == KeyStatus::Pressed {
+        if self.controller.down == KeyStatus::Pressed {
             self.player.mov(0.0, 150.0 * delta_time);
         }
 
-        if self.direction.left == KeyStatus::Pressed {
+        if self.controller.left == KeyStatus::Pressed {
             self.player.mov(-150.0 * delta_time, 0.0);
         }
 
-        if self.direction.right == KeyStatus::Pressed {
+        if self.controller.right == KeyStatus::Pressed {
             self.player.mov(150.0 * delta_time, 0.0);
         }
 
-        if self.direction.turret_left == KeyStatus::Pressed {
+        if self.controller.turret_left == KeyStatus::Pressed {
             self.player.rottate_turret_left(delta_time);
         }
 
-        if self.direction.turret_right == KeyStatus::Pressed {
+        if self.controller.turret_right == KeyStatus::Pressed {
             self.player.rottate_turret_right(delta_time);
         }
     }
