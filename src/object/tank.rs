@@ -7,10 +7,10 @@ use std::f64::consts::PI;
 use super::Entity;
 
 pub struct Tank {
-    tank_angle_rotation: f64,
-    pos_x: f64,
-    pos_y: f64,
-    turret_radian_rotation: f64,
+    pub tank_angle_rotation: f64,
+    pub pos_x: f64,
+    pub pos_y: f64,
+    pub turret_radian_rotation: f64,
     tank_sprite: Option<Texture<Resources>>,
     tank_turret_sprite: Option<Texture<Resources>>,
 }

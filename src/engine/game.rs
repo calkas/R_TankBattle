@@ -1,11 +1,10 @@
 use crate::object::tank::Tank;
+use crate::object::bullet::Bullet;
 use crate::object::Entity;
-use piston_window::{
-    clear, Button, Context, Flip, G2d, Key, PistonWindow, Texture, TextureContext, TextureSettings,
-    Transformed,
-};
+use piston_window::{clear, Button, Context, Flip, G2d, Key, PistonWindow, Transformed};
 
-use std::path::Path;
+use super::resource;
+
 pub mod settings {
     pub const RESOLUTION: [f64; 2] = [800.0, 600.0];
     pub const TITLE: &str = "R_TankBattle";
@@ -24,6 +23,7 @@ struct Control {
     right: KeyStatus,
     turret_left: KeyStatus,
     turret_right: KeyStatus,
+    fire: KeyStatus,
 }
 impl Control {
     pub fn new() -> Self {
@@ -34,48 +34,34 @@ impl Control {
             right: KeyStatus::Released,
             turret_left: KeyStatus::Released,
             turret_right: KeyStatus::Released,
+            fire: KeyStatus::Released,
         }
     }
 }
 pub struct Game {
     player: Tank,
+    bullets: Vec<Bullet>,
     controller: Control,
+    resource_manager: resource::Manager,
 }
 
 impl Game {
     pub fn new() -> Self {
         Game {
             player: Tank::new(),
+            bullets: Vec::new(),
             controller: Control::new(),
+            resource_manager: resource::Manager::new(),
         }
     }
 
-    pub fn load_sprites(&mut self, window: &PistonWindow) {
-        let mut texture_context = TextureContext {
-            factory: window.factory.clone(),
-            encoder: window.factory.clone().create_command_buffer().into(),
-        };
-
-        let texture_settings = TextureSettings::new();
-
-        let tank_sprite = Texture::from_path(
-            &mut texture_context,
-            Path::new("assets/tankBase.png"),
-            Flip::None,
-            &texture_settings,
-        );
-
-        let tank_turret = Texture::from_path(
-            &mut texture_context,
-            Path::new("assets/tankTurret.png"),
-            Flip::None,
-            &texture_settings,
-        );
+    pub fn load_resources(&mut self, window: &PistonWindow) {
+        self.resource_manager.load_texture(window, "tank", "assets/tankBase.png", Flip::None);
+        self.resource_manager.load_texture(window, "turret", "assets/tankTurret.png", Flip::None);
+        self.resource_manager.load_texture(window, "bullet", "assets/bullet.png", Flip::None);
         
-        if tank_sprite.is_ok() && tank_turret.is_ok() {
-            self.player.set_tank_sprite(tank_sprite.unwrap());
-            self.player.set_turret_sprite(tank_turret.unwrap());
-        }
+        self.player.set_tank_sprite(self.resource_manager.get_texture("tank").unwrap().clone());
+        self.player.set_turret_sprite(self.resource_manager.get_texture("turret").unwrap().clone());
     }
 
     pub fn render(&self, c: &Context, g: &mut G2d) {
@@ -84,6 +70,10 @@ impl Game {
         let center = c
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
+
+        for bullet in self.bullets.iter() {
+            bullet.render(center, g);
+        }
 
         let game_object: &dyn Entity = &self.player;
         game_object.render(center, g);
@@ -97,6 +87,7 @@ impl Game {
             Button::Keyboard(Key::Right) => self.controller.right = keystatus,
             Button::Keyboard(Key::S) => self.controller.turret_left = keystatus,
             Button::Keyboard(Key::D) => self.controller.turret_right = keystatus,
+            Button::Keyboard(Key::Space) => self.controller.fire = keystatus,
             _ => {}
         }
     }
@@ -123,6 +114,20 @@ impl Game {
 
         if self.controller.turret_right == KeyStatus::Pressed {
             self.player.rottate_turret_right(delta_time);
+        }
+
+        if self.controller.fire == KeyStatus::Pressed {
+            if self.bullets.len() < 5 {
+                let mut bullet = Bullet::new();
+                bullet.set_sprite(self.resource_manager.get_texture("bullet").unwrap().clone());
+                self.bullets.push(bullet);
+
+            }
+        }
+
+        for bullet in self.bullets.iter_mut()
+        {
+            bullet.update(delta_time);
         }
     }
 }

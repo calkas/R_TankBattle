@@ -18,7 +18,7 @@ fn main() {
 
     let mut window: PistonWindow = windows_settings.build().unwrap();
 
-    game.load_sprites(&window);
+    game.load_resources(&window);
 
     let mut events = Events::new(EventSettings::new());
 
