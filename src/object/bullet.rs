@@ -1,7 +1,6 @@
 use gfx_device_gl::Resources;
 use piston_window::{image, math, G2d, Texture, Transformed};
 use super::Entity;
-use std::f64::consts::PI;
 
 pub struct Bullet {
     pub pos_x: f64,
@@ -14,7 +13,7 @@ impl Entity for Bullet {
     fn render(&self, view: math::Matrix2d, g: &mut G2d) {
         image(
             self.sprite.as_ref().unwrap(),
-            view.trans(self.pos_x, self.pos_y).trans(-8.0, 0.0),
+            view.trans(self.pos_x, self.pos_y).trans(-8.0, -5.0),
             g,
         );
     }

@@ -3,19 +3,8 @@ use crate::object::tank::Tank;
 use crate::object::Entity;
 use piston_window::{clear, Button, Context, Flip, G2d, Key, PistonWindow, Transformed};
 
-use super::resource;
-
-pub mod settings {
-    pub const RESOLUTION: [f64; 2] = [800.0, 600.0];
-    pub const TITLE: &str = "R_TankBattle";
-    #[derive(PartialEq, Eq)]
-    pub enum KeyStatus {
-        Pressed,
-        Released,
-    }
-}
-
-use settings::KeyStatus;
+use super::{resource, settings};
+use super::settings::KeyStatus;
 struct Control {
     up: KeyStatus,
     down: KeyStatus,
@@ -42,6 +31,7 @@ pub struct Game {
     player: Tank,
     bullets: Vec<Bullet>,
     ready_for_fire: bool,
+    is_player_moving: bool,
     controller: Control,
     resource_manager: resource::Manager,
 }
@@ -52,6 +42,7 @@ impl Game {
             player: Tank::new(),
             bullets: Vec::new(),
             ready_for_fire: false,
+            is_player_moving: false,
             controller: Control::new(),
             resource_manager: resource::Manager::new(),
         }
@@ -98,32 +89,46 @@ impl Game {
         }
     }
     pub fn update(&mut self, delta_time: f64) {
+        self.tank_control_handling(delta_time);
+
+        self.turret_control_handling(delta_time);
+
+        self.bullet_control_handling(delta_time);
+    }
+
+    fn tank_control_handling(&mut self, delta_time: f64) {
         if self.controller.up == KeyStatus::Pressed {
             self.player.mov(0.0, -150.0 * delta_time);
-        }
+            self.is_player_moving = true;
 
-        if self.controller.down == KeyStatus::Pressed {
+        } else if self.controller.down == KeyStatus::Pressed {
             self.player.mov(0.0, 150.0 * delta_time);
-        }
+            self.is_player_moving = true;
 
-        if self.controller.left == KeyStatus::Pressed {
+        } else if self.controller.left == KeyStatus::Pressed {
             self.player.mov(-150.0 * delta_time, 0.0);
-        }
+            self.is_player_moving = true;
 
-        if self.controller.right == KeyStatus::Pressed {
+        } else if self.controller.right == KeyStatus::Pressed {
             self.player.mov(150.0 * delta_time, 0.0);
-        }
+            self.is_player_moving = true;
 
+        } else {
+            self.is_player_moving = false;
+        }
+    }
+
+    fn turret_control_handling(&mut self, delta_time: f64) {
         if self.controller.turret_left == KeyStatus::Pressed {
             self.player.rotate_turret_left(delta_time);
-        }
-
-        if self.controller.turret_right == KeyStatus::Pressed {
+        } else if self.controller.turret_right == KeyStatus::Pressed {
             self.player.rotate_turret_right(delta_time);
         }
+    }
 
+    fn bullet_control_handling(&mut self, delta_time: f64) {
         if self.controller.fire == KeyStatus::Pressed {
-            if self.ready_for_fire == true {
+            if self.ready_for_fire == true && self.is_player_moving == false {
                 let mut bullet = Bullet::new(
                     self.player.pos_x,
                     self.player.pos_y,

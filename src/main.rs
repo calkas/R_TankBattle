@@ -5,10 +5,11 @@ extern crate piston_window;
 use piston_window::*;
 mod engine;
 mod object;
-use engine::game::{settings, Game};
+use engine::game::Game;
+use engine::settings;
 
 fn main() {
-    println!("..::R_TankBattle::.."); 
+    println!("..::R_TankBattle::..");
 
     let mut game = Game::new();
 
