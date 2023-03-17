@@ -8,7 +8,7 @@ mod object;
 use engine::game::{settings, Game};
 
 fn main() {
-    println!("..::R_TankBattle::..");
+    println!("..::R_TankBattle::.."); 
 
     let mut game = Game::new();
 

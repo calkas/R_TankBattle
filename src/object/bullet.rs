@@ -1,12 +1,12 @@
 use gfx_device_gl::Resources;
 use piston_window::{image, math, G2d, Texture, Transformed};
 use super::Entity;
-
+use std::f64::consts::PI;
 
 pub struct Bullet {
     pub pos_x: f64,
     pub pos_y: f64,
-    rotation: f64,
+    pub rotation: f64,
     sprite: Option<Texture<Resources>>
 }
 
@@ -26,14 +26,9 @@ impl Bullet {
     }
 
     pub fn update(&mut self, dt: f64) {
-        // self.pos_x += dt * (-self.rotation.sin());
-        // self.pos_y += dt * (self.rotation.cos());
-
-
-
-        self.pos_x -= dt * (self.rotation.cos());
-        self.pos_y += dt * (-self.rotation.sin());
-        println!("Bullet x = {}, y= {}", self.pos_x, self.pos_y);
+        let velocity = 100.0;
+        self.pos_x += velocity * self.rotation.cos() * dt;
+        self.pos_y += velocity * -self.rotation.sin() * dt;
     }
 
     pub fn set_sprite(&mut self, texture: Texture<Resources>) {

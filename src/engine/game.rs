@@ -123,22 +123,24 @@ impl Game {
         }
 
         if self.controller.fire == KeyStatus::Pressed {
-
             if self.ready_for_fire == true {
-                let mut bullet = Bullet::new(self.player.pos_x, self.player.pos_y, self.player.get_turret_angle());
+                let mut bullet = Bullet::new(
+                    self.player.pos_x,
+                    self.player.pos_y,
+                    self.player.get_turret_radians(),
+                );
                 bullet.set_sprite(self.resource_manager.get_texture("bullet").unwrap().clone());
                 self.bullets.push(bullet);
                 self.ready_for_fire = false;
             }
-        }
-        else {
+        } else {
             if self.ready_for_fire == false {
                 self.ready_for_fire = true;
             }
         }
 
         for bullet in self.bullets.iter_mut() {
-            bullet.update(100.0 * delta_time);
+            bullet.update(delta_time);
         }
 
         //Remove bullets out of map
@@ -148,9 +150,5 @@ impl Game {
                 && bullet.pos_y < settings::RESOLUTION[1] / 2.0
                 && bullet.pos_y > -settings::RESOLUTION[1] / 2.0
         });
-
-        println!("Number of bullets {}", self.bullets.len());
-        println!("Angle: {}", self.player.get_turret_angle());
-        println!("Tank x = {}, y = {}", self.player.pos_x, self.player.pos_y);
     }
 }

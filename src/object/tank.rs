@@ -35,14 +35,20 @@ impl Entity for Tank {
                 view.trans(0.0, -2.0)
                     .trans(self.pos_x, self.pos_y)
                     .scale(2.0, 2.0)
-                    .rot_deg(self.tank_angle_rotation)
+                    .rot_rad(-PI / 2.0)
+                    .flip_v()
                     .rot_rad(self.turret_radian_rotation)
                     .trans(center_for_rotate.0, center_for_rotate.1),
                 g,
             );
             let square = rectangle::square(0.0, 0.0, 5.0);
             let block_color: Color = [0.90, 0.49, 0.13, 1.0];
-            rectangle(block_color, square, view.trans(self.pos_x, self.pos_y).trans(0.0, -20.0), g);
+            rectangle(
+                block_color,
+                square,
+                view.trans(self.pos_x, self.pos_y).trans(0.0, -20.0),
+                g,
+            );
         } else {
             let square = rectangle::square(0.0, 0.0, 50.0);
             let block_color: Color = [0.90, 0.49, 0.13, 1.0];
@@ -57,13 +63,13 @@ impl Tank {
             tank_angle_rotation: 0.0,
             pos_x: 0.0,
             pos_y: 0.0,
-            turret_radian_rotation: 0.0,
+            turret_radian_rotation: PI / 2.0,
             tank_sprite: None,
             tank_turret_sprite: None,
         }
     }
     pub fn mov(&mut self, x: f64, y: f64) {
-        self.set_tank_direction(x,y);
+        self.set_tank_direction(x, y);
         self.pos_x += x;
         self.pos_y += y;
     }
@@ -78,14 +84,6 @@ impl Tank {
 
     pub fn rotate_turret_left(&mut self, dt: f64) {
         let rot_speed = 1.0;
-        self.turret_radian_rotation -= rot_speed * dt;
-        if self.turret_radian_rotation <= 0.0 {
-            self.turret_radian_rotation = 2.0 * PI;
-        }
-    }
-
-    pub fn rotate_turret_right(&mut self, dt: f64) {
-        let rot_speed = 1.0;
         self.turret_radian_rotation += rot_speed * dt;
 
         if self.turret_radian_rotation >= 2.0 * PI {
@@ -93,7 +91,16 @@ impl Tank {
         }
     }
 
-    fn set_tank_direction(&mut self, x:f64, y:f64) {
+    pub fn rotate_turret_right(&mut self, dt: f64) {
+        let rot_speed = 1.0;
+        self.turret_radian_rotation -= rot_speed * dt;
+
+        if self.turret_radian_rotation <= 0.0 {
+            self.turret_radian_rotation = 2.0 * PI;
+        }
+    }
+
+    fn set_tank_direction(&mut self, x: f64, y: f64) {
         if x == 0.0 && y.is_sign_negative() {
             self.tank_angle_rotation = 0.0;
         }
@@ -109,15 +116,11 @@ impl Tank {
         if y == 0.0 && x.is_sign_negative() {
             self.tank_angle_rotation = 270.0;
         }
-        
     }
 
-    pub fn get_turret_angle(&self) -> f64 {
-        self.turret_radian_rotation * 180.0 / PI
+    pub fn get_turret_radians(&self) -> f64 {
+        self.turret_radian_rotation
     }
-
-
-    
 }
 
 #[cfg(test)]
