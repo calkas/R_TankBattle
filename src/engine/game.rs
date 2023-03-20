@@ -132,7 +132,7 @@ impl Game {
                 let mut bullet = Bullet::new(
                     self.player.pos_x,
                     self.player.pos_y,
-                    self.player.get_turret_radians(),
+                    self.player.turret_radian_rotation,
                 );
                 bullet.set_sprite(self.resource_manager.get_texture("bullet").unwrap().clone());
                 self.bullets.push(bullet);

@@ -8,8 +8,8 @@ use super::Entity;
 pub struct Tank {
     pub pos_x: f64,
     pub pos_y: f64,
-    tank_angle_rotation: f64,
-    turret_radian_rotation: f64,
+    pub tank_angle_rotation: f64,
+    pub turret_radian_rotation: f64,
     tank_sprite: Option<Texture<Resources>>,
     tank_turret_sprite: Option<Texture<Resources>>,
 }
@@ -18,7 +18,7 @@ impl Entity for Tank {
     fn render(&self, view: math::Matrix2d, g: &mut G2d) {
         //This is half of the turret sprite size
         let center_for_rotate = (-16.0, -16.0);
-        
+
         image(
             self.tank_sprite.as_ref().unwrap(),
             view.trans(self.pos_x, self.pos_y)
@@ -102,10 +102,6 @@ impl Tank {
             self.tank_angle_rotation = 270.0;
         }
     }
-
-    pub fn get_turret_radians(&self) -> f64 {
-        self.turret_radian_rotation
-    }
 }
 
 #[cfg(test)]
@@ -119,5 +115,43 @@ mod tests {
         tank.mov(10.0, 15.0);
         assert_eq!(tank.pos_x, 10.0);
         assert_eq!(tank.pos_y, 15.0);
+    }
+    #[test]
+    fn should_move_tank_to_direction() {
+        let mut tank = Tank::new();
+
+        //Turn right
+        tank.mov(15.0, 0.0);
+        assert_eq!(tank.tank_angle_rotation, 90.0);
+
+        //Turn down
+        tank.mov(0.0, 15.0);
+        assert_eq!(tank.tank_angle_rotation, 180.0);
+
+        //Turn left
+        tank.mov(-15.0, 0.0);
+        assert_eq!(tank.tank_angle_rotation, 270.0);
+
+        //Turn up
+        tank.mov(0.0, -15.0);
+        assert_eq!(tank.tank_angle_rotation, 0.0);
+    }
+    #[test]
+    fn should_move_turret_to_direction() {
+        let mut tank = Tank::new();
+        assert_eq!(tank.turret_radian_rotation, PI / 2.0);
+
+        tank.rotate_turret_left(PI / 2.0);
+        assert_eq!(tank.turret_radian_rotation, PI);
+
+        tank.rotate_turret_right(PI / 2.0);
+        assert_eq!(tank.turret_radian_rotation, PI / 2.0);
+
+        //Boundary conditions
+        tank.rotate_turret_left(2.0 * PI);
+        assert_eq!(tank.turret_radian_rotation, 0.0);
+
+        tank.rotate_turret_right(PI);
+        assert_eq!(tank.turret_radian_rotation, 2.0 * PI);
     }
 }
