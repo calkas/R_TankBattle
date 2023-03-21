@@ -1,6 +1,7 @@
 use crate::object::bullet::Bullet;
 use crate::object::tank::Tank;
 use crate::object::Entity;
+use crate::object::map::GameMap;
 use piston_window::{clear, Button, Context, Flip, G2d, Key, PistonWindow, Transformed};
 
 use super::{resource, settings};
@@ -33,6 +34,7 @@ pub struct Game {
     ready_for_fire: bool,
     is_player_moving: bool,
     controller: Control,
+    map: GameMap,
     resource_manager: resource::Manager,
 }
 
@@ -44,6 +46,7 @@ impl Game {
             ready_for_fire: false,
             is_player_moving: false,
             controller: Control::new(),
+            map: GameMap::new(),
             resource_manager: resource::Manager::new(),
         }
     }
@@ -56,10 +59,14 @@ impl Game {
         self.resource_manager
             .load_texture(window, "bullet", "assets/bullet.png", Flip::None);
 
+        self.resource_manager.load_texture(window, "map1", "assets/grass_template2.jpg", Flip::None);
+
         self.player
             .set_tank_sprite(self.resource_manager.get_texture("tank").unwrap().clone());
         self.player
             .set_turret_sprite(self.resource_manager.get_texture("turret").unwrap().clone());
+
+        self.map.set_sprite(self.resource_manager.get_texture("map1").unwrap().clone());
     }
 
     pub fn render(&self, c: &Context, g: &mut G2d) {
@@ -68,6 +75,9 @@ impl Game {
         let center = c
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
+
+
+        self.map.render(c.transform,g);
 
         for bullet in self.bullets.iter() {
             bullet.render(center, g);
