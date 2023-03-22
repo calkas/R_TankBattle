@@ -1,11 +1,11 @@
 use crate::object::bullet::Bullet;
-use crate::object::tank::Tank;
-use crate::object::Entity;
 use crate::object::map::GameMap;
-use piston_window::{clear, Button, Context, Flip, G2d, Key, PistonWindow, Transformed};
+use crate::object::tank::Tank;
+use crate::object::Renderable;
+use piston_window::{clear, Button, Context, G2d, Key, Transformed};
 
-use super::{resource, settings};
 use super::settings::KeyStatus;
+use super::{resource, settings};
 struct Control {
     up: KeyStatus,
     down: KeyStatus,
@@ -28,45 +28,33 @@ impl Control {
         }
     }
 }
-pub struct Game {
-    player: Tank,
-    bullets: Vec<Bullet>,
+pub struct Game<'a> {
+    player: Tank<'a>,
+    bullets: Vec<Bullet<'a>>,
+    map: GameMap<'a>,
     ready_for_fire: bool,
     is_player_moving: bool,
     controller: Control,
-    map: GameMap,
-    resource_manager: resource::Manager,
+    resource_manager: &'a resource::Manager,
 }
 
-impl Game {
-    pub fn new() -> Self {
-        Game {
-            player: Tank::new(),
+impl<'a> Game<'a> {
+    pub fn new(res: &'a resource::Manager) -> Self {
+        let player = Tank::new(
+            res.get_texture("tank").unwrap(),
+            res.get_texture("turret").unwrap(),
+        );
+        let map = GameMap::new(res.get_texture("map1").unwrap());
+
+        return Game {
+            player,
             bullets: Vec::new(),
+            map,
             ready_for_fire: false,
             is_player_moving: false,
             controller: Control::new(),
-            map: GameMap::new(),
-            resource_manager: resource::Manager::new(),
-        }
-    }
-
-    pub fn load_resources(&mut self, window: &PistonWindow) {
-        self.resource_manager
-            .load_texture(window, "tank", "assets/tankBase.png", Flip::None);
-        self.resource_manager
-            .load_texture(window, "turret", "assets/tankTurret.png", Flip::None);
-        self.resource_manager
-            .load_texture(window, "bullet", "assets/bullet.png", Flip::None);
-
-        self.resource_manager.load_texture(window, "map1", "assets/grass_template2.jpg", Flip::None);
-
-        self.player
-            .set_tank_sprite(self.resource_manager.get_texture("tank").unwrap().clone());
-        self.player
-            .set_turret_sprite(self.resource_manager.get_texture("turret").unwrap().clone());
-
-        self.map.set_sprite(self.resource_manager.get_texture("map1").unwrap().clone());
+            resource_manager: res,
+        };
     }
 
     pub fn render(&self, c: &Context, g: &mut G2d) {
@@ -76,9 +64,7 @@ impl Game {
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
 
-
-        self.map.render(c.transform,g);
-
+        self.map.render(c.transform, g);
         for bullet in self.bullets.iter() {
             bullet.render(center, g);
         }
@@ -110,19 +96,15 @@ impl Game {
         if self.controller.up == KeyStatus::Pressed {
             self.player.mov(0.0, -150.0 * delta_time);
             self.is_player_moving = true;
-
         } else if self.controller.down == KeyStatus::Pressed {
             self.player.mov(0.0, 150.0 * delta_time);
             self.is_player_moving = true;
-
         } else if self.controller.left == KeyStatus::Pressed {
             self.player.mov(-150.0 * delta_time, 0.0);
             self.is_player_moving = true;
-
         } else if self.controller.right == KeyStatus::Pressed {
             self.player.mov(150.0 * delta_time, 0.0);
             self.is_player_moving = true;
-
         } else {
             self.is_player_moving = false;
         }
@@ -139,12 +121,12 @@ impl Game {
     fn bullet_control_handling(&mut self, delta_time: f64) {
         if self.controller.fire == KeyStatus::Pressed {
             if self.ready_for_fire == true && self.is_player_moving == false {
-                let mut bullet = Bullet::new(
+                let bullet = Bullet::new(
                     self.player.pos_x,
                     self.player.pos_y,
                     self.player.turret_radian_rotation,
+                    self.resource_manager.get_texture("bullet").unwrap(),
                 );
-                bullet.set_sprite(self.resource_manager.get_texture("bullet").unwrap().clone());
                 self.bullets.push(bullet);
                 self.ready_for_fire = false;
             }
