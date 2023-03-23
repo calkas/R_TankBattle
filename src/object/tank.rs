@@ -1,6 +1,6 @@
 use crate::piston_window::Transformed;
 use gfx_device_gl::Resources;
-use piston_window::{image, math, G2d, Texture};
+use piston_window::{image, math, G2d, Texture, rectangle, types::Color};
 use std::f64::consts::PI;
 
 use super::Renderable;
@@ -39,6 +39,10 @@ impl Renderable for Tank<'_> {
                 .trans(center_for_rotate.0, center_for_rotate.1),
             g,
         );
+
+        //let square = rectangle::square(0.0, 0.0, 64.0);
+        //let block_color: Color = [0.90, 0.49, 0.13, 1.0];
+        //rectangle(block_color, square, view.trans(self.pos_x, self.pos_y).trans(center_for_rotate.0, center_for_rotate.1).trans(-16.0 ,-16.0), g);
     }
 }
 
@@ -73,7 +77,7 @@ impl<'a> Tank<'a> {
     }
 
     pub fn rotate_turret_right(&mut self, dt: f64) {
-        let rot_speed = 1.0;
+        let rot_speed = 1.5;
         self.turret_radian_rotation -= rot_speed * dt;
 
         if self.turret_radian_rotation <= 0.0 {

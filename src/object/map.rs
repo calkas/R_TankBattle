@@ -12,7 +12,7 @@ impl Renderable for GameMap<'_> {
     fn render(&self, view: math::Matrix2d, g: &mut G2d) {
         image(
             self.sprite,
-            view.trans(self.pos_x, self.pos_y).scale(1.0, 1.0),
+            view.trans(self.pos_x, self.pos_y),
             g,
         );
     }

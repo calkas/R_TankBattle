@@ -2,6 +2,7 @@ extern crate gfx;
 extern crate gfx_device_gl;
 extern crate gfx_graphics;
 extern crate piston_window;
+extern crate rand;
 use piston_window::*;
 mod engine;
 mod object;
@@ -14,7 +15,7 @@ fn load_resources(manager: &mut resource::Manager, window: &PistonWindow) {
     manager.load_texture(&window, "turret", "assets/tankTurret.png", Flip::None);
     manager.load_texture(&window, "bullet", "assets/bullet.png", Flip::None);
     manager.load_texture(&window, "map1", "assets/grass_template2.jpg", Flip::None);
-}
+    manager.load_texture(&window, "target", "assets/target.png", Flip::None);}
 
 fn main() {
     println!("..::R_TankBattle::..");

@@ -6,6 +6,7 @@ pub struct Bullet<'a> {
     pub pos_x: f64,
     pub pos_y: f64,
     pub rotation: f64,
+    pub to_destroy: bool,
     sprite: &'a Texture<Resources>,
 }
 
@@ -24,13 +25,14 @@ impl<'a> Bullet<'a> {
         Bullet {
             pos_x: x,
             pos_y: y,
+            to_destroy: false,
             rotation: rot,
             sprite: texture,
         }
     }
 
     pub fn update(&mut self, dt: f64) {
-        let velocity = 100.0;
+        let velocity = 170.0;
         self.pos_x += velocity * self.rotation.cos() * dt;
         self.pos_y += velocity * -self.rotation.sin() * dt;
     }
