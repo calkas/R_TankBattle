@@ -1,7 +1,7 @@
 use crate::object::bullet::Bullet;
 use crate::object::map::GameMap;
 use crate::object::tank::Tank;
-use crate::object::target::Target;
+use crate::object::target::ShootingTarget;
 use crate::object::Renderable;
 use piston_window::{clear, Button, Context, G2d, Key, Transformed};
 use rand::Rng;
@@ -33,7 +33,7 @@ impl Control {
 pub struct Game<'a> {
     player: Tank<'a>,
     bullets: Vec<Bullet<'a>>,
-    targets: Vec<Target<'a>>,
+    targets: Vec<ShootingTarget<'a>>,
     map: GameMap<'a>,
     ready_for_fire: bool,
     is_player_moving: bool,
@@ -98,13 +98,13 @@ impl<'a> Game<'a> {
 
         self.turret_control_handling(delta_time);
 
-        self.target_handling();
+        self.shooting_target_handling();
 
         self.bullet_control_handling(delta_time);
     }
 
-    fn target_handling(&mut self) {
-        if self.targets.len() < 1 {
+    fn shooting_target_handling(&mut self) {
+        if self.targets.len() == 0 {
             let mut rng = rand::thread_rng();
             let x = rng.gen_range(
                 ((-settings::RESOLUTION[0] / 2.0) + 40.0)..((settings::RESOLUTION[0] / 2.0) - 40.0),
@@ -112,20 +112,20 @@ impl<'a> Game<'a> {
             let y = rng.gen_range(
                 ((-settings::RESOLUTION[1] / 2.0) + 40.0)..((settings::RESOLUTION[1] / 2.0) - 40.0),
             );
-            let target = Target::new(x, y, self.resource_manager.get_texture("target").unwrap());
+            let target = ShootingTarget::new(x, y, self.resource_manager.get_texture("target").unwrap());
             self.targets.push(target);
         }
 
         //Remove target
         self.targets.retain(|target| {
             for bullet in self.bullets.iter_mut() {
-                if target.is_collision(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
+                if target.collide_with(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
                     bullet.to_destroy = true;
                     return false;
                 }
             }
 
-            if target.is_collision(
+            if target.collide_with(
                 self.player.pos_x - 32.0,
                 self.player.pos_y - 32.0,
                 32.0,

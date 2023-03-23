@@ -2,13 +2,13 @@ use super::Renderable;
 use gfx_device_gl::Resources;
 use piston_window::{image, math, G2d, Texture, Transformed};
 
-pub struct Target<'a> {
+pub struct ShootingTarget<'a> {
     pub pos_x: f64,
     pub pos_y: f64,
     pub sprite: &'a Texture<Resources>,
 }
 
-impl Renderable for Target<'_> {
+impl Renderable for ShootingTarget<'_> {
     fn render(&self, view: math::Matrix2d, g: &mut G2d) {
         image(
             self.sprite,
@@ -18,16 +18,16 @@ impl Renderable for Target<'_> {
     }
 }
 
-impl<'a> Target<'a> {
+impl<'a> ShootingTarget<'a> {
     pub fn new(x: f64, y: f64, texture: &'a Texture<Resources>) -> Self {
-        Target {
+        ShootingTarget {
             pos_x: x,
             pos_y: y,
             sprite: &texture,
         }
     }
 
-    pub fn is_collision(
+    pub fn collide_with(
         &self,
         object_pos_x: f64,
         object_pos_y: f64,
