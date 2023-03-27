@@ -3,7 +3,7 @@ use crate::object::map::GameMap;
 use crate::object::tank::Tank;
 use crate::object::target::ShootingTarget;
 use crate::object::Renderable;
-use piston_window::{clear, Button, Context, G2d, Key, Transformed};
+use piston_window::{clear, Button, Context, G2d, Key, Transformed, Glyphs, Text};
 use rand::Rng;
 
 use super::settings::KeyStatus;
@@ -39,6 +39,7 @@ pub struct Game<'a> {
     is_player_moving: bool,
     controller: Control,
     resource_manager: &'a resource::Manager,
+    score: u32,
 }
 
 impl<'a> Game<'a> {
@@ -58,10 +59,11 @@ impl<'a> Game<'a> {
             is_player_moving: false,
             controller: Control::new(),
             resource_manager: res,
+            score: 0,
         };
     }
 
-    pub fn render(&self, c: &Context, g: &mut G2d) {
+    pub fn render(&self, c: &Context, g: &mut G2d, glyph: &mut Glyphs) {
         clear([0.0, 0.0, 0.0, 1.0], g);
 
         self.map.render(c.transform, g);
@@ -69,6 +71,11 @@ impl<'a> Game<'a> {
         let center = c
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
+
+
+        let score_str = format!("Score: {}                            Press arrows to move. Keys [S],[D] turn turret. [SPACE] fire", self.score);
+
+        Text::new_color([255.0, 0.0, 0.0, 1.0], 24).draw(score_str.as_str(), glyph, &c.draw_state, c.transform.trans(20.0, 50.0), g).unwrap();
 
         for bullet in self.bullets.iter() {
             bullet.render(center, g);
@@ -121,6 +128,7 @@ impl<'a> Game<'a> {
             for bullet in self.bullets.iter_mut() {
                 if target.collide_with(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
                     bullet.to_destroy = true;
+                    self.score += 10;
                     return false;
                 }
             }
@@ -131,6 +139,7 @@ impl<'a> Game<'a> {
                 32.0,
                 32.0,
             ) {
+                self.score += 1;
                 return false;
             }
             return true;

@@ -44,4 +44,9 @@ impl<'a> ShootingTarget<'a> {
             self.pos_y + target_h >= object_pos_y && object_pos_y + object_h >= self.pos_y;
         return collision_x && collision_y;
     }
+
+    #[allow(dead_code)]
+    pub fn set_sprite(&mut self, texture: &'a Texture<Resources>) {
+        self.sprite = texture;
+    }
 }

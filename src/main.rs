@@ -15,7 +15,8 @@ fn load_resources(manager: &mut resource::Manager, window: &PistonWindow) {
     manager.load_texture(&window, "turret", "assets/tankTurret.png", Flip::None);
     manager.load_texture(&window, "bullet", "assets/bullet.png", Flip::None);
     manager.load_texture(&window, "map1", "assets/grass_template2.jpg", Flip::None);
-    manager.load_texture(&window, "target", "assets/target.png", Flip::None);}
+    manager.load_texture(&window, "target", "assets/target.png", Flip::None);
+}
 
 fn main() {
     println!("..::R_TankBattle::..");
@@ -27,6 +28,9 @@ fn main() {
     let mut window: PistonWindow = windows_settings.build().unwrap();
 
     let mut resource_manager = resource::Manager::new();
+
+    let mut glyph = window.load_font("assets/fonts/Roboto-Bold.ttf").unwrap();
+
     load_resources(&mut resource_manager, &window);
 
     let mut game = Game::new(&resource_manager);
@@ -48,8 +52,10 @@ fn main() {
             game.update(args.dt);
         });
 
-        window.draw_2d(&e, |c, g, _d| {
-            game.render(&c, g);
+        window.draw_2d(&e, |c, g, d| {
+            game.render(&c, g, &mut glyph);
+            // Update glyphs before rendering.
+            glyph.factory.encoder.flush(d);
         });
     }
 
