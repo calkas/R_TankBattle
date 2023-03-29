@@ -3,7 +3,7 @@ use crate::object::map::GameMap;
 use crate::object::tank::Tank;
 use crate::object::target::ShootingTarget;
 use crate::object::Renderable;
-use piston_window::{clear, Button, Context, G2d, Key, Transformed, Glyphs, Text};
+use piston_window::{clear, Button, Context, G2d, Glyphs, Key, Text, Transformed};
 use rand::Rng;
 
 use super::settings::KeyStatus;
@@ -40,6 +40,7 @@ pub struct Game<'a> {
     controller: Control,
     resource_manager: &'a resource::Manager,
     score: u32,
+    time: f64,
 }
 
 impl<'a> Game<'a> {
@@ -60,6 +61,7 @@ impl<'a> Game<'a> {
             controller: Control::new(),
             resource_manager: res,
             score: 0,
+            time: 0.0,
         };
     }
 
@@ -72,10 +74,17 @@ impl<'a> Game<'a> {
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
 
+        let score_str = format!("Score: {}             Time: {:.1}", self.score, self.time);
 
-        let score_str = format!("Score: {}                            Press arrows to move. Keys [S],[D] turn turret. [SPACE] fire", self.score);
-
-        Text::new_color([255.0, 0.0, 0.0, 1.0], 24).draw(score_str.as_str(), glyph, &c.draw_state, c.transform.trans(20.0, 50.0), g).unwrap();
+        Text::new_color([255.0, 0.0, 0.0, 1.0], 24)
+            .draw(
+                score_str.as_str(),
+                glyph,
+                &c.draw_state,
+                c.transform.trans(20.0, 50.0),
+                g,
+            )
+            .unwrap();
 
         for bullet in self.bullets.iter() {
             bullet.render(center, g);
@@ -101,6 +110,7 @@ impl<'a> Game<'a> {
         }
     }
     pub fn update(&mut self, delta_time: f64) {
+        self.time += delta_time;
         self.tank_control_handling(delta_time);
 
         self.turret_control_handling(delta_time);
@@ -119,14 +129,21 @@ impl<'a> Game<'a> {
             let y = rng.gen_range(
                 ((-settings::RESOLUTION[1] / 2.0) + 40.0)..((settings::RESOLUTION[1] / 2.0) - 40.0),
             );
-            let target = ShootingTarget::new(x, y, self.resource_manager.get_texture("target").unwrap());
+            let target =
+                ShootingTarget::new(x, y, self.resource_manager.get_texture("target").unwrap());
             self.targets.push(target);
         }
 
         //Remove target
         self.targets.retain(|target| {
             for bullet in self.bullets.iter_mut() {
-                if target.collide_with(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
+                // if target.collide_with(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
+                //     bullet.to_destroy = true;
+                //     self.score += 10;
+                //     return false;
+                // }
+
+                if target.collide_circle_with(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
                     bullet.to_destroy = true;
                     self.score += 10;
                     return false;

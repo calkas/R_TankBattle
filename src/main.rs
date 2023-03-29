@@ -10,14 +10,6 @@ use engine::game::Game;
 use engine::resource;
 use engine::settings;
 
-fn load_resources(manager: &mut resource::Manager, window: &PistonWindow) {
-    manager.load_texture(&window, "tank", "assets/tankBase.png", Flip::None);
-    manager.load_texture(&window, "turret", "assets/tankTurret.png", Flip::None);
-    manager.load_texture(&window, "bullet", "assets/bullet.png", Flip::None);
-    manager.load_texture(&window, "map1", "assets/grass_template2.jpg", Flip::None);
-    manager.load_texture(&window, "target", "assets/target.png", Flip::None);
-}
-
 fn main() {
     println!("..::R_TankBattle::..");
 
@@ -28,10 +20,9 @@ fn main() {
     let mut window: PistonWindow = windows_settings.build().unwrap();
 
     let mut resource_manager = resource::Manager::new();
+    resource_manager.load_textures(&window);
 
     let mut glyph = window.load_font("assets/fonts/Roboto-Bold.ttf").unwrap();
-
-    load_resources(&mut resource_manager, &window);
 
     let mut game = Game::new(&resource_manager);
 

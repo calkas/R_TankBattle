@@ -17,7 +17,10 @@ pub struct Tank<'a> {
 impl Renderable for Tank<'_> {
     fn render(&self, view: math::Matrix2d, g: &mut G2d) {
         //This is half of the turret sprite size
-        let center_for_rotate = (-16.0, -16.0);
+
+        let turret_dimension = self.tank_turret_sprite.surface.get_info().kind.get_dimensions();
+
+        let center_for_rotate = ((-0.5) * turret_dimension.0 as f64, (-0.5) * turret_dimension.1 as f64);
 
         image(
             self.tank_sprite,

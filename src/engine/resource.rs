@@ -37,4 +37,12 @@ impl Manager {
     pub fn get_texture(&self, name: &str) -> Option<&Texture<Resources>> {
         self.textures.get(&name.to_string())
     }
+
+    pub fn load_textures(&mut self, window: &PistonWindow) {
+        self.load_texture(&window, "tank", "assets/tankBase.png", Flip::None);
+        self.load_texture(&window, "turret", "assets/tankTurret.png", Flip::None);
+        self.load_texture(&window, "bullet", "assets/bullet.png", Flip::None);
+        self.load_texture(&window, "map1", "assets/grass_template2.jpg", Flip::None);
+        self.load_texture(&window, "target", "assets/target.png", Flip::None);
+    }
 }
