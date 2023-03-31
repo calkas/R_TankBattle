@@ -95,6 +95,7 @@ impl<'a> Game<'a> {
         }
 
         self.player.render(center, g);
+
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
@@ -143,7 +144,7 @@ impl<'a> Game<'a> {
                 //     return false;
                 // }
 
-                if target.collide_circle_with(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
+                if target.collide_circle_with(bullet.object.x, bullet.object.y, 16.0, 16.0) {
                     bullet.to_destroy = true;
                     self.score += 10;
                     return false;
@@ -225,10 +226,10 @@ impl<'a> Game<'a> {
 
         //Remove bullets out of map
         self.bullets.retain(|bullet| {
-            bullet.pos_x < settings::RESOLUTION[0] / 2.0
-                && bullet.pos_x > -settings::RESOLUTION[0] / 2.0
-                && bullet.pos_y < settings::RESOLUTION[1] / 2.0
-                && bullet.pos_y > -settings::RESOLUTION[1] / 2.0
+            bullet.object.x < settings::RESOLUTION[0] / 2.0
+                && bullet.object.x > -settings::RESOLUTION[0] / 2.0
+                && bullet.object.y < settings::RESOLUTION[1] / 2.0
+                && bullet.object.y > -settings::RESOLUTION[1] / 2.0
         });
     }
 }
