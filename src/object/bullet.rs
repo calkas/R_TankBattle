@@ -1,3 +1,5 @@
+use std::f64::consts::PI;
+
 use super::Object;
 use super::Renderable;
 use gfx_device_gl::Resources;
@@ -10,23 +12,34 @@ pub struct Bullet<'a> {
 
 impl Renderable for Bullet<'_> {
     fn render(&self, view: math::Matrix2d, g: &mut G2d) {
-        view.trans(-8.0, -5.0);
         self.object.render(view, g);
     }
 }
 
 impl<'a> Bullet<'a> {
-    pub fn new(x: f64, y: f64, rotation: f64, texture: &'a Texture<Resources>) -> Self {
+    pub fn new(x: f64, y: f64, texture: &'a Texture<Resources>) -> Self {
         Self {
             object: Object {
                 x,
                 y,
                 scale: 1.0,
-                rotation,
+                rotation: 0.0,
                 velocity: 170.0,
                 sprite: Some(texture),
             },
             to_destroy: false,
+        }
+    }
+
+    pub fn calculate_rotation(&mut self, turret_rotation: f64) {
+        if 0.0 <= turret_rotation && turret_rotation <= PI / 2.0 {
+            self.object.rotation = PI / 2.0 - turret_rotation;
+        } else if PI / 2.0 < turret_rotation && turret_rotation <= PI {
+            self.object.rotation = 2.0 * PI + PI / 2.0 - turret_rotation;
+        } else if PI < turret_rotation && turret_rotation <= 3.0 * PI / 2.0 {
+            self.object.rotation = PI / 2.0 + 2.0 * PI - turret_rotation;
+        } else {
+            self.object.rotation = 2.0 * PI + PI / 2.0 - turret_rotation;
         }
     }
 

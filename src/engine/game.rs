@@ -95,7 +95,6 @@ impl<'a> Game<'a> {
         }
 
         self.player.render(center, g);
-
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
@@ -152,8 +151,8 @@ impl<'a> Game<'a> {
             }
 
             if target.collide_with(
-                self.player.pos_x - 32.0,
-                self.player.pos_y - 32.0,
+                self.player.hull.x - 32.0,
+                self.player.hull.y - 32.0,
                 32.0,
                 32.0,
             ) {
@@ -166,16 +165,18 @@ impl<'a> Game<'a> {
 
     fn tank_control_handling(&mut self, delta_time: f64) {
         if self.controller.up == KeyStatus::Pressed {
-            self.player.mov(0.0, -150.0 * delta_time);
+            self.player
+                .mov(0.0, -self.player.hull.velocity * delta_time);
             self.is_player_moving = true;
         } else if self.controller.down == KeyStatus::Pressed {
-            self.player.mov(0.0, 150.0 * delta_time);
+            self.player.mov(0.0, self.player.hull.velocity * delta_time);
             self.is_player_moving = true;
         } else if self.controller.left == KeyStatus::Pressed {
-            self.player.mov(-150.0 * delta_time, 0.0);
+            self.player
+                .mov(-self.player.hull.velocity * delta_time, 0.0);
             self.is_player_moving = true;
         } else if self.controller.right == KeyStatus::Pressed {
-            self.player.mov(150.0 * delta_time, 0.0);
+            self.player.mov(self.player.hull.velocity * delta_time, 0.0);
             self.is_player_moving = true;
         } else {
             self.is_player_moving = false;
@@ -193,12 +194,13 @@ impl<'a> Game<'a> {
     fn bullet_control_handling(&mut self, delta_time: f64) {
         if self.controller.fire == KeyStatus::Pressed {
             if self.ready_for_fire == true && self.is_player_moving == false {
-                let bullet = Bullet::new(
-                    self.player.pos_x,
-                    self.player.pos_y,
-                    self.player.turret_radian_rotation,
+                let mut bullet = Bullet::new(
+                    self.player.hull.x,
+                    self.player.hull.y,
                     self.resource_manager.get_texture("bullet").unwrap(),
                 );
+                bullet.calculate_rotation(self.player.turret.rotation);
+
                 self.bullets.push(bullet);
                 self.ready_for_fire = false;
             }
