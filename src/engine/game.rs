@@ -6,6 +6,7 @@ use crate::object::Renderable;
 use piston_window::{clear, Button, Context, G2d, Glyphs, Key, Text, Transformed};
 use rand::Rng;
 
+use super::collider::intersection;
 use super::settings::KeyStatus;
 use super::{resource, settings};
 struct Control {
@@ -137,25 +138,13 @@ impl<'a> Game<'a> {
         //Remove target
         self.targets.retain(|target| {
             for bullet in self.bullets.iter_mut() {
-                // if target.collide_with(bullet.pos_x, bullet.pos_y, 16.0, 16.0) {
-                //     bullet.to_destroy = true;
-                //     self.score += 10;
-                //     return false;
-                // }
-
-                if target.collide_circle_with(bullet.object.x, bullet.object.y, 16.0, 16.0) {
+                if intersection::circle::collision(&target.target, &bullet.object) {
                     bullet.to_destroy = true;
                     self.score += 10;
                     return false;
                 }
             }
-
-            if target.collide_with(
-                self.player.hull.x - 32.0,
-                self.player.hull.y - 32.0,
-                32.0,
-                32.0,
-            ) {
+            if intersection::rectangle::collision(&target.target, &self.player.hull) {
                 self.score += 1;
                 return false;
             }

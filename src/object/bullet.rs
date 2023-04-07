@@ -3,7 +3,7 @@ use std::f64::consts::PI;
 use super::Object;
 use super::Renderable;
 use gfx_device_gl::Resources;
-use piston_window::{math, G2d, Texture, Transformed};
+use piston_window::{math, G2d, Texture};
 
 pub struct Bullet<'a> {
     pub object: Object<'a>,
