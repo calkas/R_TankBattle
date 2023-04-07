@@ -1,9 +1,7 @@
-use super::Object;
+use super::{Object, Renderable};
 use gfx_device_gl::Resources;
 use piston_window::{math, G2d, Texture};
 use std::f64::consts::PI;
-
-use super::Renderable;
 
 pub struct Tank<'a> {
     pub hull: Object<'a>,
@@ -74,10 +72,8 @@ impl<'a> Tank<'a> {
             self.hull.rotate_to(PI + PI / 2.0);
         }
     }
-}
 
-impl Renderable for Tank<'_> {
-    fn render(&self, view: math::Matrix2d, g: &mut G2d) {
+    pub fn render(&self, view: math::Matrix2d, g: &mut G2d) {
         self.hull.render(view, g);
         self.turret.render(view, g);
     }

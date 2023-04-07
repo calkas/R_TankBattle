@@ -69,11 +69,11 @@ impl<'a> Game<'a> {
     pub fn render(&self, c: &Context, g: &mut G2d, glyph: &mut Glyphs) {
         clear([0.0, 0.0, 0.0, 1.0], g);
 
-        self.map.render(c.transform, g);
-
         let center = c
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
+        
+        self.map.background.render(center, g);
 
         let score_str = format!("Score: {}             Time: {:.1}", self.score, self.time);
 
@@ -88,11 +88,11 @@ impl<'a> Game<'a> {
             .unwrap();
 
         for bullet in self.bullets.iter() {
-            bullet.render(center, g);
+            bullet.object.render(center, g);
         }
 
         for target in self.targets.iter() {
-            target.render(center, g);
+            target.target.render(center, g);
         }
 
         self.player.render(center, g);

@@ -1,19 +1,12 @@
 use std::f64::consts::PI;
 
 use super::Object;
-use super::Renderable;
 use gfx_device_gl::Resources;
-use piston_window::{math, G2d, Texture};
+use piston_window::Texture;
 
 pub struct Bullet<'a> {
     pub object: Object<'a>,
     pub to_destroy: bool,
-}
-
-impl Renderable for Bullet<'_> {
-    fn render(&self, view: math::Matrix2d, g: &mut G2d) {
-        self.object.render(view, g);
-    }
 }
 
 impl<'a> Bullet<'a> {

@@ -1,15 +1,9 @@
-use super::{Object, Renderable};
+use super::Object;
 use gfx_device_gl::Resources;
-use piston_window::{math, G2d, Texture};
+use piston_window::Texture;
 
 pub struct ShootingTarget<'a> {
     pub target: Object<'a>,
-}
-
-impl Renderable for ShootingTarget<'_> {
-    fn render(&self, view: math::Matrix2d, g: &mut G2d) {
-        self.target.render(view, g);
-    }
 }
 
 impl<'a> ShootingTarget<'a> {
