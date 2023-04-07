@@ -72,7 +72,7 @@ impl<'a> Game<'a> {
         let center = c
             .transform
             .trans(settings::RESOLUTION[0] / 2.0, settings::RESOLUTION[1] / 2.0);
-        
+
         self.map.background.render(center, g);
 
         let score_str = format!("Score: {}             Time: {:.1}", self.score, self.time);
@@ -154,22 +154,28 @@ impl<'a> Game<'a> {
 
     fn tank_control_handling(&mut self, delta_time: f64) {
         if self.controller.up == KeyStatus::Pressed {
-            self.player
-                .mov(0.0, -self.player.hull.velocity * delta_time);
-            self.is_player_moving = true;
+            self.try_move_player(0.0, -self.player.hull.velocity * delta_time);
         } else if self.controller.down == KeyStatus::Pressed {
-            self.player.mov(0.0, self.player.hull.velocity * delta_time);
-            self.is_player_moving = true;
+            self.try_move_player(0.0, self.player.hull.velocity * delta_time);
         } else if self.controller.left == KeyStatus::Pressed {
-            self.player
-                .mov(-self.player.hull.velocity * delta_time, 0.0);
-            self.is_player_moving = true;
+            self.try_move_player(-self.player.hull.velocity * delta_time, 0.0);
         } else if self.controller.right == KeyStatus::Pressed {
-            self.player.mov(self.player.hull.velocity * delta_time, 0.0);
-            self.is_player_moving = true;
+            self.try_move_player(self.player.hull.velocity * delta_time, 0.0);
         } else {
             self.is_player_moving = false;
         }
+    }
+
+    fn try_move_player(&mut self, x: f64, y: f64) {
+        if self.map.is_out_of_boundaries(
+            self.player.hull.x + x,
+            self.player.hull.y + y,
+            &self.player.hull,
+        ) {
+            return;
+        }
+        self.player.mov(x, y);
+        self.is_player_moving = true;
     }
 
     fn turret_control_handling(&mut self, delta_time: f64) {
@@ -217,10 +223,13 @@ impl<'a> Game<'a> {
 
         //Remove bullets out of map
         self.bullets.retain(|bullet| {
-            bullet.object.x < settings::RESOLUTION[0] / 2.0
-                && bullet.object.x > -settings::RESOLUTION[0] / 2.0
-                && bullet.object.y < settings::RESOLUTION[1] / 2.0
-                && bullet.object.y > -settings::RESOLUTION[1] / 2.0
+            if self
+                .map
+                .is_out_of_boundaries(bullet.object.x, bullet.object.y, &bullet.object)
+            {
+                return false;
+            }
+            return true;
         });
     }
 }
