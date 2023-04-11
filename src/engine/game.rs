@@ -3,34 +3,14 @@ use crate::object::map::GameMap;
 use crate::object::tank::Tank;
 use crate::object::target::ShootingTarget;
 use crate::object::Renderable;
-use piston_window::{clear, Button, Context, G2d, Glyphs, Key, Text, Transformed};
+use piston_window::{clear, Button, Context, G2d, Glyphs, Text, Transformed};
 use rand::Rng;
 
 use super::collider::intersection;
+use super::input::Controller;
 use super::settings::KeyStatus;
 use super::{resource, settings};
-struct Control {
-    up: KeyStatus,
-    down: KeyStatus,
-    left: KeyStatus,
-    right: KeyStatus,
-    turret_left: KeyStatus,
-    turret_right: KeyStatus,
-    fire: KeyStatus,
-}
-impl Control {
-    pub fn new() -> Self {
-        Control {
-            up: KeyStatus::Released,
-            down: KeyStatus::Released,
-            left: KeyStatus::Released,
-            right: KeyStatus::Released,
-            turret_left: KeyStatus::Released,
-            turret_right: KeyStatus::Released,
-            fire: KeyStatus::Released,
-        }
-    }
-}
+
 pub struct Game<'a> {
     player: Tank<'a>,
     bullets: Vec<Bullet<'a>>,
@@ -38,7 +18,7 @@ pub struct Game<'a> {
     map: GameMap<'a>,
     ready_for_fire: bool,
     is_player_moving: bool,
-    controller: Control,
+    controller: Controller,
     resource_manager: &'a resource::Manager,
     score: u32,
     time: f64,
@@ -59,7 +39,7 @@ impl<'a> Game<'a> {
             map,
             ready_for_fire: false,
             is_player_moving: false,
-            controller: Control::new(),
+            controller: Controller::default(),
             resource_manager: res,
             score: 0,
             time: 0.0,
@@ -75,6 +55,16 @@ impl<'a> Game<'a> {
 
         self.map.background.render(center, g);
 
+        for bullet in self.bullets.iter() {
+            bullet.object.render(center, g);
+        }
+
+        for target in self.targets.iter() {
+            target.target.render(center, g);
+        }
+
+        self.player.render(center, g);
+
         let score_str = format!("Score: {}             Time: {:.1}", self.score, self.time);
 
         Text::new_color([255.0, 0.0, 0.0, 1.0], 24)
@@ -86,29 +76,10 @@ impl<'a> Game<'a> {
                 g,
             )
             .unwrap();
-
-        for bullet in self.bullets.iter() {
-            bullet.object.render(center, g);
-        }
-
-        for target in self.targets.iter() {
-            target.target.render(center, g);
-        }
-
-        self.player.render(center, g);
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
-        match input {
-            Button::Keyboard(Key::Up) => self.controller.up = keystatus,
-            Button::Keyboard(Key::Down) => self.controller.down = keystatus,
-            Button::Keyboard(Key::Left) => self.controller.left = keystatus,
-            Button::Keyboard(Key::Right) => self.controller.right = keystatus,
-            Button::Keyboard(Key::S) => self.controller.turret_left = keystatus,
-            Button::Keyboard(Key::D) => self.controller.turret_right = keystatus,
-            Button::Keyboard(Key::Space) => self.controller.fire = keystatus,
-            _ => {}
-        }
+        self.controller.on_input(input, keystatus);
     }
     pub fn update(&mut self, delta_time: f64) {
         self.time += delta_time;
@@ -153,13 +124,13 @@ impl<'a> Game<'a> {
     }
 
     fn tank_control_handling(&mut self, delta_time: f64) {
-        if self.controller.up == KeyStatus::Pressed {
+        if self.controller.is_up() {
             self.try_move_player(0.0, -self.player.hull.velocity * delta_time);
-        } else if self.controller.down == KeyStatus::Pressed {
+        } else if self.controller.is_down() {
             self.try_move_player(0.0, self.player.hull.velocity * delta_time);
-        } else if self.controller.left == KeyStatus::Pressed {
+        } else if self.controller.is_left() {
             self.try_move_player(-self.player.hull.velocity * delta_time, 0.0);
-        } else if self.controller.right == KeyStatus::Pressed {
+        } else if self.controller.is_right() {
             self.try_move_player(self.player.hull.velocity * delta_time, 0.0);
         } else {
             self.is_player_moving = false;
@@ -179,15 +150,15 @@ impl<'a> Game<'a> {
     }
 
     fn turret_control_handling(&mut self, delta_time: f64) {
-        if self.controller.turret_left == KeyStatus::Pressed {
+        if self.controller.is_turret_left() {
             self.player.rotate_turret_left(delta_time);
-        } else if self.controller.turret_right == KeyStatus::Pressed {
+        } else if self.controller.is_turret_right() {
             self.player.rotate_turret_right(delta_time);
         }
     }
 
     fn bullet_control_handling(&mut self, delta_time: f64) {
-        if self.controller.fire == KeyStatus::Pressed {
+        if self.controller.is_fire() {
             if self.ready_for_fire == true && self.is_player_moving == false {
                 let mut bullet = Bullet::new(
                     self.player.hull.x,
