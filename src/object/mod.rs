@@ -5,6 +5,7 @@ pub mod bullet;
 pub mod map;
 pub mod tank;
 pub mod target;
+pub mod ui;
 
 pub trait Renderable {
     fn render(&self, view: math::Matrix2d, g: &mut G2d);

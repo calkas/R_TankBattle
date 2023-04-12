@@ -44,5 +44,6 @@ impl Manager {
         self.load_texture(&window, "bullet", "assets/bullet.png", Flip::None);
         self.load_texture(&window, "map1", "assets/grass_template2.jpg", Flip::None);
         self.load_texture(&window, "target", "assets/target.png", Flip::None);
+        self.load_texture(&window, "ui_score_board", "assets/futureui1.png", Flip::None);
     }
 }
