@@ -3,6 +3,7 @@ pub struct GameStatistics {
     pub time: f64,
     pub is_player_moving: bool,
     pub ready_for_fire: bool,
+    pub is_gameover: bool,
 }
 
 impl GameStatistics {
@@ -12,6 +13,7 @@ impl GameStatistics {
             time: 0.0,
             is_player_moving: false,
             ready_for_fire: false,
+            is_gameover: false,
         }
     }
 
@@ -23,11 +25,9 @@ impl GameStatistics {
         self.score += 10;
     }
 
-    pub fn reset_game_time(&mut self) {
+    pub fn reset_game(&mut self) {
         self.time = 0.0;
-    }
-
-    pub fn reset_score(&mut self) {
         self.score = 0;
+        self.is_gameover = false;
     }
 }

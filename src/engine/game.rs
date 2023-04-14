@@ -31,7 +31,10 @@ impl<'a> Game<'a> {
             res.get_texture("turret").unwrap(),
         );
         let map = GameMap::new(res.get_texture("map1").unwrap());
-        let ui = UI::new(res.get_texture("ui_score_board").unwrap());
+        let ui = UI::new(
+            res.get_texture("ui_score_board").unwrap(),
+            res.get_texture("ui_gameover").unwrap(),
+        );
 
         return Game {
             player,
@@ -61,6 +64,10 @@ impl<'a> Game<'a> {
         }
         self.player.render(center, g);
         self.ui.render(c, g, glyph);
+
+        if self.game_stats.is_gameover {
+            self.ui.game_over(c, g, glyph);
+        }
     }
 
     pub fn input(&mut self, input: Button, keystatus: KeyStatus) {
@@ -69,7 +76,21 @@ impl<'a> Game<'a> {
 
     pub fn update(&mut self, delta_time: f64) {
         self.game_stats.time += delta_time;
-        
+
+        if self.game_stats.time > settings::GAME_TIME {
+            self.game_stats.is_gameover = true;
+        }
+
+        if self.game_stats.is_gameover {
+            if !self.controller.is_reset() {
+                return;
+            }
+            self.bullets.clear();
+            self.targets.clear();
+            self.player.reset();
+            self.game_stats.reset_game();
+        }
+
         self.tank_control_handling(delta_time);
 
         self.turret_control_handling(delta_time);
@@ -78,7 +99,8 @@ impl<'a> Game<'a> {
 
         self.bullet_control_handling(delta_time);
 
-        self.ui.score_board_update(self.game_stats.score, self.game_stats.time);
+        self.ui
+            .score_board_update(self.game_stats.score, self.game_stats.time);
     }
 
     fn shooting_target_handling(&mut self) {

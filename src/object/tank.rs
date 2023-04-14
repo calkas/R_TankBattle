@@ -32,6 +32,12 @@ impl<'a> Tank<'a> {
             },
         }
     }
+    pub fn reset(&mut self) {
+        self.hull.mov_to(0.0, 0.0);
+        self.turret.mov_to(0.0, 0.0);
+        self.hull.rotate_to(0.0);
+        self.turret.rotate_to(0.0);
+    }
 
     pub fn mov(&mut self, x: f64, y: f64) {
         self.hull.mov(x, y);

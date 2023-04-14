@@ -15,10 +15,11 @@ pub struct UI<'a> {
     score_board: Object<'a>,
     game_score: u32,
     game_time: f64,
+    gameover_board: Object<'a>,
 }
 
 impl<'a> UI<'a> {
-    pub fn new(score_board_texture: &'a Texture<Resources>) -> Self {
+    pub fn new(score_board_texture: &'a Texture<Resources>, gameover_texture: &'a Texture<Resources>) -> Self {
         Self {
             score_board: Object {
                 x: settings::RESOLUTION[0] / 8.0,
@@ -30,6 +31,15 @@ impl<'a> UI<'a> {
             },
             game_score: 0,
             game_time: 0.0,
+
+            gameover_board: Object {
+                x: settings::RESOLUTION[0] / 2.0,
+                y: settings::RESOLUTION[1] / 2.0,
+                scale: 1.0,
+                rotation: 0.0,
+                velocity: 1.0,
+                sprite: Some(gameover_texture),
+            },
         }
     }
 
@@ -40,12 +50,37 @@ impl<'a> UI<'a> {
 
     pub fn render(&self, c: &Context, g: &mut G2d, glyph: &mut Glyphs) {
         self.score_board.render(c.transform, g);
-        let score_str = format!("Score: {}     Time: {:.1}", self.game_score, self.game_time);
+        let score_str = format!("Score: {}         Time: {:.1}", self.game_score, self.game_time);
         Self::draw_text(
             score_str.as_str(),
             [30.0, 60.0],
             20,
             color::ORANGE,
+            glyph,
+            c,
+            g,
+        );
+    }
+
+    pub fn game_over(&self, c: &Context, g: &mut G2d, glyph: &mut Glyphs) {
+        self.gameover_board.render(c.transform, g);
+
+        let score_str = format!("X {} ", self.game_score);
+        Self::draw_text(
+            score_str.as_str(),
+            [(settings::RESOLUTION[0] / 2.0) - 20.0, (settings::RESOLUTION[1] / 2.0) + 100.0],
+            48,
+            color::WHITE,
+            glyph,
+            c,
+            g,
+        );
+
+        Self::draw_text(
+            "Press Enter to restart the game",
+            [(settings::RESOLUTION[0] / 3.0) + 50.0, (settings::RESOLUTION[1] / 2.0) + 190.0],
+            20,
+            color::GREEN,
             glyph,
             c,
             g,

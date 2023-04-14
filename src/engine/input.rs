@@ -9,6 +9,7 @@ pub struct Controller {
     turret_left: KeyStatus,
     turret_right: KeyStatus,
     fire: KeyStatus,
+    game_reset: KeyStatus,
 }
 
 impl Controller {
@@ -21,6 +22,7 @@ impl Controller {
             turret_left: KeyStatus::Released,
             turret_right: KeyStatus::Released,
             fire: KeyStatus::Released,
+            game_reset: KeyStatus::Released,
         }
     }
 
@@ -33,6 +35,7 @@ impl Controller {
             Button::Keyboard(Key::S) => self.turret_left = status,
             Button::Keyboard(Key::D) => self.turret_right = status,
             Button::Keyboard(Key::Space) => self.fire = status,
+            Button::Keyboard(Key::Return) => self.game_reset = status,
             _ => {}
         }
     }
@@ -62,6 +65,10 @@ impl Controller {
 
     pub fn is_fire(&self) -> bool {
         self.fire == KeyStatus::Pressed
+    }
+
+    pub fn is_reset(&self) -> bool {
+        self.game_reset == KeyStatus::Pressed
     }
 }
 
