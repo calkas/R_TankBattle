@@ -3,7 +3,7 @@ use crate::engine::settings;
 use gfx_device_gl::Resources;
 use piston_window::Texture;
 use piston_window::{Context, G2d, Glyphs, Text, Transformed};
-
+#[allow(dead_code)]
 pub mod color {
     pub const ORANGE: [f32; 4] = [255.0, 215.0, 0.0, 1.0];
     pub const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 0.0];

@@ -1,11 +1,8 @@
-extern crate gfx;
-extern crate gfx_device_gl;
-extern crate gfx_graphics;
-extern crate piston_window;
-extern crate rand;
-use piston_window::*;
-mod engine;
-mod object;
+use piston_window::{
+    EventSettings, Events, PistonWindow, PressEvent, ReleaseEvent, UpdateEvent, WindowSettings,
+};
+mod engine; //Import engine
+mod object; //Import object
 use engine::game::Game;
 use engine::resource;
 use engine::settings;
@@ -28,7 +25,7 @@ fn main() {
 
     let mut events = Events::new(EventSettings::new());
 
-    println!("Game starts...");
+    println!("  Game starts...");
 
     while let Some(e) = events.next(&mut window) {
         e.press(|key| {
